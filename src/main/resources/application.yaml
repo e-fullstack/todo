@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: @project.name@
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/mydatabase
+    username: myuser
+    password: secret
