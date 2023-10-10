@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TodoRepositoryTest {
     @Container
     @ServiceConnection
-    static final PostgreSQLContainer PSQL = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE)
+    static final PostgreSQLContainer<?> PSQL = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE)
             .withCopyFileToContainer(MountableFile.forClasspathResource("db/schema.sql"), "/docker-entrypoint-initdb.d/schema.sql")
             .waitingFor(Wait.forListeningPort());
 
@@ -63,9 +63,9 @@ class TodoRepositoryTest {
                 //Read - ById
                 () -> {
                     StepVerifier
-                            .create(todoRepository.findById("1"))
+                            .create(todoRepository.findById(1l))
                             .consumeNextWith(r -> {
-                                assertEquals("1", r.id());
+                                assertEquals(1, r.id());
                                 assertEquals("Todo Name", r.name());
                                 assertEquals("Todo Description", r.description());
                                 assertEquals(LocalDateTime.of(2023,10,9,22,10), r.dateTime());
@@ -74,10 +74,28 @@ class TodoRepositoryTest {
                 },
                 //Update
                 () -> {
-
+                    var todoToBeUpdated = new Todo(1l,"Todo Name Change", "Todo Description", LocalDateTime.of(2023,10,9,22,10), true);
+                    StepVerifier
+                            .create(todoRepository.save(todoToBeUpdated))
+                            .consumeNextWith(r -> {
+                                assertEquals(1, r.id());
+                                assertEquals("Todo Name Change", r.name());
+                                assertEquals("Todo Description", r.description());
+                                assertEquals(LocalDateTime.of(2023,10,9,22,10), r.dateTime());
+                            })
+                            .verifyComplete();
                 },
                 //Delete
                 () -> {
+                    StepVerifier
+                            .create(todoRepository.deleteById(1l))
+                            .verifyComplete();
+
+                    StepVerifier
+                            .create(todoRepository.findAll())
+                            .expectNextCount(0)
+                            .verifyComplete();
+
                 });
     }
 }
