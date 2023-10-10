@@ -1,5 +1,6 @@
 package dev.efullstack.todo.routers;
 
+import dev.efullstack.todo.models.Todo;
 import dev.efullstack.todo.services.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,22 +31,34 @@ public class TodoRouters {
     }
 
     private Mono<ServerResponse> deleteTodo(ServerRequest request) {
-        return ServerResponse.noContent().build();
+        var id = Long.parseLong(request.pathVariable("id"));
+        return todoService.deleteTodo(id)
+                .flatMap(ServerResponse.ok()::bodyValue);
     }
 
     private Mono<ServerResponse> updateTodo(ServerRequest request) {
-        return ServerResponse.noContent().build();
+        var id = Long.parseLong(request.pathVariable("id"));
+        return request
+                .bodyToMono(Todo.class)
+                .map(todo -> todoService.updateTodo(id, todo))
+                .flatMap(ServerResponse.ok()::bodyValue);
     }
 
     private Mono<ServerResponse> todoById(ServerRequest request) {
-        return ServerResponse.noContent().build();
+        var id = Long.parseLong(request.pathVariable("id"));
+        return todoService
+                .todoById(id)
+                .flatMap(ServerResponse.ok()::bodyValue);
     }
 
     private Mono<ServerResponse> saveTodo(ServerRequest request) {
-        return ServerResponse.noContent().build();
+        return request
+                .bodyToMono(Todo.class)
+                .flatMap(todoService::newTodo)
+                .flatMap(ServerResponse.status(201)::bodyValue);
     }
 
     private Mono<ServerResponse> allTodos(ServerRequest request) {
-        return ServerResponse.noContent().build();
+        return ServerResponse.ok().bodyValue(todoService.allTodo());
     }
 }

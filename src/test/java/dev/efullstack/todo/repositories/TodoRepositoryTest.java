@@ -45,6 +45,7 @@ class TodoRepositoryTest {
                     StepVerifier
                             .create(todoRepository.save(newTodo))
                             .consumeNextWith(r -> {
+                                System.out.println(r);
                                 assertNotNull(r);
                                 assertNotNull(r.id());
                                 assertEquals("Todo Name", r.name());
@@ -78,6 +79,7 @@ class TodoRepositoryTest {
                     StepVerifier
                             .create(todoRepository.save(todoToBeUpdated))
                             .consumeNextWith(r -> {
+                                System.out.println(r);
                                 assertEquals(1, r.id());
                                 assertEquals("Todo Name Change", r.name());
                                 assertEquals("Todo Description", r.description());
