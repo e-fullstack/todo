@@ -1,0 +1,29 @@
+name: OAS Deployment
+on:
+  workflow_dispatch:
+  push:
+    paths:
+    - 'oas'
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      pages: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure Pages
+        uses: actions/configure-pages@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: oas
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
