@@ -2,6 +2,7 @@ package dev.efullstack.todo.services;
 
 import dev.efullstack.todo.models.Todo;
 import dev.efullstack.todo.repositories.TodoRepository;
+import dev.efullstack.todo.utils.TodoNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -19,7 +20,9 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public Mono<Todo> todoById(Long id) {
-        return todoRepository.findById(id);
+        return todoRepository
+                .findById(id)
+                .switchIfEmpty(Mono.error(TodoNotFoundException::new));
     }
 
     @Override

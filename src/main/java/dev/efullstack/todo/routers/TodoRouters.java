@@ -2,6 +2,7 @@ package dev.efullstack.todo.routers;
 
 import dev.efullstack.todo.models.Todo;
 import dev.efullstack.todo.services.TodoService;
+import dev.efullstack.todo.utils.TodoNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +41,7 @@ public class TodoRouters {
         var id = Long.parseLong(request.pathVariable("id"));
         return request
                 .bodyToMono(Todo.class)
-                .map(todo -> todoService.updateTodo(id, todo))
+                .flatMap(todo -> todoService.updateTodo(id, todo))
                 .flatMap(ServerResponse.ok()::bodyValue);
     }
 
@@ -59,6 +60,6 @@ public class TodoRouters {
     }
 
     private Mono<ServerResponse> allTodos(ServerRequest request) {
-        return ServerResponse.ok().bodyValue(todoService.allTodo());
+        return ServerResponse.ok().body(todoService.allTodo(), Todo.class);
     }
 }

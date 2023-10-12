@@ -57,9 +57,90 @@ class TodoRoutersTest {
                                 }
                             """);
                 },
-                () -> {},
-                () -> {},
-                () -> {}
+                () -> {
+                    webTestClient
+                            .get()
+                            .uri("/todo")
+                            .exchange()
+                            .expectStatus()
+                            .isOk()
+                            .expectBody()
+                            .json("""
+                                [
+                                    {
+                                        "id": 1,
+                                        "name": "Car Wash",
+                                        "description": "in Toyota",
+                                        "dateTime": "2023-10-01T13:20:00",
+                                        "status": true
+                                    }
+                                ]
+                            """);
+                },
+                () -> {
+                    webTestClient
+                            .get()
+                            .uri("/todo/{id}", 1)
+                            .exchange()
+                            .expectStatus()
+                            .isOk()
+                            .expectBody()
+                            .json("""
+                                {
+                                    "id": 1,
+                                    "name": "Car Wash",
+                                    "description": "in Toyota",
+                                    "dateTime": "2023-10-01T13:20:00",
+                                    "status": true
+                                }
+                            """);
+                },
+                () -> {
+                    webTestClient
+                            .put()
+                            .uri("/todo/{id}", 1)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue("""
+                                 {
+                                    "id": 1,
+                                    "name": "Car Wash Updated",
+                                    "description": "in Toyota",
+                                    "dateTime": "2023-10-01T13:20:00",
+                                    "status": true
+                                }
+                             """)
+                            .exchange()
+                            .expectStatus()
+                            .isOk()
+                            .expectBody()
+                            .json("""
+                                {
+                                    "id": 1,
+                                    "name": "Car Wash Updated",
+                                    "description": "in Toyota",
+                                    "dateTime": "2023-10-01T13:20:00",
+                                    "status": true
+                                }
+                            """);
+                },
+                () -> {
+                    webTestClient
+                            .delete()
+                            .uri("/todo/{id}", 1)
+                            .exchange()
+                            .expectStatus()
+                            .isOk();
+
+                    webTestClient
+                            .get()
+                            .uri("/todo/{id}", 1)
+                            .exchange()
+                            .expectStatus()
+                            .isNotFound()
+                            .expectBody()
+                            .jsonPath("$.path").isEqualTo("/todo/1")
+                            .jsonPath("$.status").isEqualTo(404);
+                }
         );
     }
 }

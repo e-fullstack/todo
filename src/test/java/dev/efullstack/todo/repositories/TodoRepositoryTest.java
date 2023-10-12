@@ -39,7 +39,7 @@ class TodoRepositoryTest {
     void crudTest() {
         assertNotNull(todoRepository);
         var newTodo = new Todo(null,"Todo Name", "Todo Description", LocalDateTime.of(2023,10,9,22,10), true);
-        assertAll("",
+        assertAll("CRUD Test",
                 //Create
                 () -> {
                     StepVerifier
